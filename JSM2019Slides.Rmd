@@ -1,5 +1,5 @@
 ---
-title: "Lady Tasting Tea Lineups"
+title: "Lady Tasting Tea Lineups for Visual Inference"
 author: "Karsten Maurer"
 # institute: "Miami University"
 date: "July 31, 2019"
@@ -29,7 +29,7 @@ knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/thumb/3/
 
 .footnote[
 [1] Fisher, R. A. (1960)
-
+]
 
 - Ronald Fisher and Muriel Bristol working at Rothamsted
 
@@ -127,12 +127,15 @@ tt_lineup_plot(dat_stacked) +
 
 - Applying experimental design from the lady tasting tea
 
-- Randomized lineup of null and target Plots
+- Randomized lineup of with multiple null and *multiple* target plots
 
 - Target plots need random perturbation of real data to avoid facsimile issues
 
-- Viewer (*tea-taster*) tasked with classifying plots into two groups
+- Viewer (*tea-taster*) tasked with classifying plots into two sets
 
+???
+
+"The Lady Tasting Tea" by David Salsburg
 ---
 class: center, middle
 
@@ -198,7 +201,7 @@ exampleNullPlotBuild$permy[exampleNullPlotBuild$type == "Permutation"] <- exampl
 ```
 
 ---
-#### Generating Null Plots for Tea-Tasting Lineups
+### Generating Null Plots for Tea-Tasting Lineups
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=10,fig.height=7, cache=TRUE}
 p2 <- ggplot() +
@@ -221,7 +224,7 @@ knitr::include_graphics("MakingNullPlots.png")
 ```
 
 ---
-#### Generating Target Plots for Tea-Tasting Lineups
+### Generating Target Plots for Tea-Tasting Lineups
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=10,fig.height=7, cache=TRUE}
 p1 <- ggplot() +
@@ -243,11 +246,12 @@ ggsave(file="MakingTargetPlots.png",dpi=600,
 knitr::include_graphics("MakingTargetPlots.png")
 ```
 
+
 ---
 ### Example Tea Tasting Lineup
 
 ```{r,echo=FALSE,fig.width=9, fig.height=6, out.height=500,out.width=750, fig.align='center', cache=TRUE}
-p4 <- tt_lineup_plot(make_lineup_dat(M=8, dat=faithful, xname="waiting", yname="eruptions", seed=12345))+
+p4 <- tt_lineup_plot(make_lineup_dat(M=8, dat=sample_n(faithful,50), xname="waiting", yname="eruptions", seed=12345))+
   theme(panel.spacing = unit(.2, "lines"),
         strip.text=element_text(size=14))
 
@@ -258,6 +262,8 @@ knitr::include_graphics("faithful_lineup.png")
 ```
 ---
 ### Properties
+
+- Looks similar to traditional lineup for visual inference
 
 - p-values for single TT lineup evaluation are no longer binary
 
@@ -271,46 +277,151 @@ knitr::include_graphics("faithful_lineup.png")
 
 --
 
-2. How should one calculate a p-value for the TT lineup?
+2. Are the TT lineup p-values hypergeometrically distributed?
 
 --
 
 3. How might the TT lineup compare to numerical tests?
 
 ---
-### Empirical Survey
+### Survey
 
-- Presented 8 TT lineups from different data scenarios  
+- Participants presented with eight TT lineups based on eight datasets 
 
-| Datasets in survey TT lineups | Description of datasets  |
-|:-----|:-----|
-| Old-Faithful | Randomly selected rows faithful dataset in base R |
-| Diamonds | Randomly selected rows from diamonds dataset in *ggplot2* R package|
-| Linear-Weak | bivariate normal  mean=[0,0], var=[1,.3,.3,1] |
-| Linear-Strong | bivariate normal  mean=[0,0], var=[1,.6,.6,1] |
-| Curved-Weak | x ~ unif(-3,3), y=0.5*x^2+error   error~N(0,2.6) |
-| Curved-Strong | x ~ unif(-3,3), y=0.5*x^2+error   error~N(0,1.4) |
-| Independent Unif | x ~ unif(0,1),  y ~ unif(0,1) |
-| Independent Normal | x ~ N(0,1),  y ~ N(0,1) |
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=8, fig.height=4, cache=TRUE}
+# Set parameters for lineup and individual
+cor_val=.9
+participant_number = 1
+M_pairs = 8
 
+# load/simulate data here
+library(mvtnorm)
+n=50
+set.seed(participant_number)
+survey_order=sample(1:8)
+sim_data <- list(NULL)
+set.seed(2345)
+sim_data[[1]] <- as.data.frame(mvtnorm::rmvnorm(n, mean=c(0,0), sigma=matrix(c(1,.6,.6,1),nrow=2,byrow=TRUE)))
+sim_data[[2]] <- as.data.frame(mvtnorm::rmvnorm(n, mean=c(0,0), sigma=matrix(c(1,.3,.3,1),nrow=2,byrow=TRUE)))
+sim_data[[3]] <- sim_curve(n=n, b0=0, b1=0, b2=.5, sd=2.6, range=c(-3,3))
+sim_data[[4]] <- sim_curve(n=n, b0=0, b1=0, b2=.5, sd=1.4, range=c(-3,3))
+sim_data[[5]] <- sample_n(faithful,n)
+sim_data[[6]] <- sample_n(select(diamonds,carat,price),n)
+sim_data[[7]] <- data.frame(x=rnorm(n), y=rnorm(n))
+sim_data[[8]] <- data.frame(x=runif(n), y=runif(n))
+
+simtype = c("Strong Linear","Weak Linear","Curved Weak","Curved Strong",
+            "Old Faithful","Diamonds","Independent-Normal","Independent-Uniform")
+
+
+for(i in 1:8){
+  names(sim_data[[i]]) <- c("x","y")
+  sim_data[[i]]$simtype <- simtype[i]
+}
+
+survey_dat <- do.call(rbind,sim_data) %>%
+  mutate(simtype = factor(simtype, levels=c("Independent-Normal","Weak Linear","Strong Linear","Diamonds",
+                                           "Independent-Uniform","Curved Weak","Curved Strong","Old Faithful")))
+
+p5 <- ggplot() +
+  geom_point(aes(x,y), data=survey_dat) +
+  facet_wrap(~simtype, nrow=2, scales = "free") +
+  theme_bw()+
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        panel.grid = element_blank())
+
+ggsave(file="survey_data.png",dpi=600,
+       width=10, height=5,units="in")
+
+knitr::include_graphics("survey_data.png")
+```
+
+---
+### Survey
+
+- Administration:
+
+  + distributed to students and faculty of Miami University Stat Department
+  + blinded drop-box for return
+  
 --
 
 - Randomization: 
-  + Datasets uniquely simulated for each survey
+
+  + Datasets uniquely simulated/sampled for each survey
   + Random order of lineups on survey
   + Random plot ordering within lineups
   + Permutation step for each plot construction
 
 --
 
-- Survey question about Undergrad/Grad/Faculty
+- 45 participants completed all eight lineups 
+  + 24 Undergrad, 14 Grad, 6 Faculty, 1 Unknown
 
 ---
+class: center, middle
 
+# Results
+
+---
+### 1. Does the TT lineup have discriminative power in practice?
+
+
+---
+### 2. Are the TT lineup p-values hypergeometrically distributed?
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=8, fig.height=4, cache=TRUE}
+load("graph_df.Rdata")
+# wide to tall, scale to density values, clean labels
+tall_dat <- graph_df %>%
+  gather(key="type",value="value",expected:observed_normal) %>%
+  group_by(type) %>%
+  mutate(density = value/sum(value)) %>%
+  ungroup() %>%
+  mutate(distn_type= factor(type,labels=c("Hypergeometric","Observed - Ind Normal","Observed - Ind Uniform")))
+
+# set aside observed distributions under uniform and normal generated data
+observed_distn <- filter(tall_dat,distn_type!="Hypergeometric")%>%
+  mutate(facet_frame = distn_type)
+# make a version of the HG distn that will overlay into each facet frame
+baseline_distn <- rbind(filter(tall_dat,distn_type=="Hypergeometric"),
+                        filter(tall_dat,distn_type=="Hypergeometric"))
+baseline_distn$facet_frame <- observed_distn$facet_frame
+
+# faceted version of empirical distributions
+p6 <- ggplot() + 
+  geom_bar(aes(x=x, y=density, fill=distn_type, color=distn_type),
+           size=1,alpha=.6, stat="identity",
+           data=baseline_distn)  + 
+  geom_bar(aes(x=x+.02, y=density, fill=distn_type, color=distn_type),
+           size=1,alpha=.2, stat="identity", 
+           data=observed_distn) +
+  facet_grid(. ~ facet_frame ) +
+  scale_fill_manual(values=c("gray80","red","blue")) +
+  scale_color_manual(values=c("black","red","blue")) +
+  labs(x="Number of Correct Responses",
+       y="Probability Density",
+       color=" ",fill=" ")+
+  theme_bw()+
+  theme(legend.position = "bottom")
+
+ggsave(file="DensityComparisons.png",dpi=600,
+       width=8, height=4,units="in")
+
+knitr::include_graphics("DensityComparisons.png")
+```
+
+
+---
+### 3. How might the TT lineup compare to numerical tests?
+
+
+---
 class: center, middle
 
 # Thanks!
 
 Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
 
-The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
