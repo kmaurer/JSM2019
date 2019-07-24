@@ -49,3 +49,10 @@ h1, h2, h3, h4 {
   margin-bottom: -11.6px;
   margin-right:68px;
 }
+
+.remark-slide-content {
+  padding-top: 10px;
+  padding-left: 150px;
+  padding-right: 150px;
+  padding-bottom: 10px;
+}

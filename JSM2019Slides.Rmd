@@ -18,6 +18,8 @@ output:
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
+library(tidyverse)
+library(teaTasteR)
 ```
 
 
@@ -25,11 +27,9 @@ options(htmltools.dir.version = FALSE)
 knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Nice_Cup_of_Tea.jpg/1280px-Nice_Cup_of_Tea.jpg")
 ```
 
-
-
 .footnote[
-[1] Fisher, R. A. (1960). The design of experiments. The design of experiments., (7th Ed).
-]
+[1] Fisher, R. A. (1960)
+
 
 - Ronald Fisher and Muriel Bristol working at Rothamsted
 
@@ -47,11 +47,51 @@ Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sharin
 
 ---
 
-### Lineups (in Visual Inference) <sup>2</sup>
+### Lineups 
+
+```{r, echo=FALSE, fig.align='center', out.height=380, fig.cap='Can the witness pick the criminal out of a randomized lineup of people?'}
+knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/0/04/Oppstilling-2.jpg")
+```
+
+???
+
+Image credit: [Wikimedia Commons](https://upload.wikimedia.org/wikipedia/commons/0/04/Oppstilling-2.jpg)
+
+
+---
+
+### Lineups (for Visual Inference) <sup>2</sup>
 
 .footnote[
-[2] Buja, A., Cook, D., Hofmann, H., Lawrence, M., Lee, E. K., Swayne, D. F., & Wickham, H. (2009). Statistical inference for exploratory data analysis and model diagnostics. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 367(1906), 4361-4383.
+[2] Buja, A., Cook, D., Hofmann, H., Lawrence, M., Lee, E. K., Swayne, D. F., & Wickham, H. (2009)
 ]
+
+
+```{r, echo=FALSE, fig.align='center', fig.width=9, fig.height=6, out.height=380,out.width=570,  cache=TRUE, fig.cap='Can the statistician pick the real data out of a randomized lineup of data simulated under the null?'}
+set.seed(12345)
+M=19
+diamond_samp <- sample_n(diamonds,500)
+order_types = sample(c(rep("null",  M),"real"), M+1)
+dat_stacked = NULL
+    for (i in 1:(M+1)) {
+        if (order_types[i] == "null"){
+          dat_i = make_null_dat(dat=diamond_samp,xname = "carat",yname="price")
+        }  
+        if (order_types[i] == "real"){
+          dat_i = data.frame(x=diamond_samp$carat,
+                             permy=diamond_samp$price,
+                             type="real")
+        } 
+        dat_i$order = i
+        dat_stacked = rbind(dat_stacked, dat_i)
+    }   
+tt_lineup_plot(dat_stacked) +
+  theme(panel.spacing = unit(.2, "lines"),
+        strip.text=element_text(size=14))
+```
+---
+
+### Lineups (for Visual Inference)
 
 
 - Plot of real data hidden in set of plots of data generated under null model
