@@ -278,14 +278,32 @@ knitr::include_graphics("faithful_lineup.png")
 3. How might the TT lineup compare to numerical tests?
 
 ---
-# Tables
+### Empirical Survey
 
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
+- Presented 8 TT lineups from different data scenarios  
 
-```{r}
-knitr::kable(head(iris), format = 'html')
-```
+| Datasets in survey TT lineups | Description of datasets  |
+|:-----|:-----|
+| Old-Faithful | Randomly selected rows faithful dataset in base R |
+| Diamonds | Randomly selected rows from diamonds dataset in *ggplot2* R package|
+| Linear-Weak | bivariate normal  mean=[0,0], var=[1,.3,.3,1] |
+| Linear-Strong | bivariate normal  mean=[0,0], var=[1,.6,.6,1] |
+| Curved-Weak | x ~ unif(-3,3), y=0.5*x^2+error   error~N(0,2.6) |
+| Curved-Strong | x ~ unif(-3,3), y=0.5*x^2+error   error~N(0,1.4) |
+| Independent Unif | x ~ unif(0,1),  y ~ unif(0,1) |
+| Independent Normal | x ~ N(0,1),  y ~ N(0,1) |
 
+--
+
+- Randomization: 
+  + Datasets uniquely simulated for each survey
+  + Random order of lineups on survey
+  + Random plot ordering within lineups
+  + Permutation step for each plot construction
+
+--
+
+- Survey question about Undergrad/Grad/Faculty
 
 ---
 
