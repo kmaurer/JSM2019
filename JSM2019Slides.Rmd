@@ -125,13 +125,140 @@ tt_lineup_plot(dat_stacked) +
 -- 
 #### Mashup: Tea Tasting + Lineup Plots
 
-- 
+- Applying experimental design from the lady tasting tea
 
+- Randomized lineup of null and target Plots
+
+- Target plots need random perturbation of real data to avoid facsimile issues
+
+- Viewer (*tea-taster*) tasked with classifying plots into two groups
 
 ---
+class: center, middle
+
+# Methods
+
+```{r, include=FALSE}
+#------------------------------------
+### make plot building walkthrough with faithful data
+
+set.seed(123)
+examplePlotBuild1 <- faithful %>%
+  mutate(type="Original") %>%
+  sample_n(100)%>%
+  select(eruptions,waiting,type)
+
+examplePlotBuild2 <- examplePlotBuild1 %>%
+  mutate(type="LOESS Fitted")%>%
+  mutate(type = factor(type,levels=c("Original","LOESS Fitted","Residuals Permuted")))%>%
+  select(eruptions,waiting,type)
+
+set.seed(123)
+examplePlotBuild3 <- examplePlotBuild1 %>%
+  make_alt_dat(xname="waiting",yname="eruptions") %>%
+  mutate(type="Residuals Permuted") %>%
+  mutate(waiting=x, 
+         eruptions=permy)%>%
+  select(waiting,eruptions,type)
+
+examplePlotBuild4 <- examplePlotBuild3 %>%
+  mutate(type="Target Plot")
 
 
+examplePlotBuild2alt <- examplePlotBuild2 %>% 
+  mutate(type="LOESS Fit then Residuals Permuted",
+         type=factor(type,levels=c("Original","LOESS Fit then Residuals Permuted","Target Plot")))
+exampleTargetPlotBuild <- rbind(examplePlotBuild1,examplePlotBuild2alt,examplePlotBuild4) %>%
+  mutate(type = factor(type,levels=c("Original","LOESS Fit then Residuals Permuted","Target Plot")),
+         plottype = "Target Plot Construction", 
+         permx=NA,permy=NA)
+exampleTargetPlotBuild$permx[exampleTargetPlotBuild$type == "LOESS Fit then Residuals Permuted"] <- examplePlotBuild4$waiting
+exampleTargetPlotBuild$permy[exampleTargetPlotBuild$type == "LOESS Fit then Residuals Permuted"] <- examplePlotBuild4$eruptions
 
+# permute the x and y to get final plot
+exampleNullPlotBuild3 <- examplePlotBuild1 %>%
+  make_null_dat(xname="waiting",yname="eruptions") %>%
+  mutate(type="Null Plot") %>%
+  mutate(waiting=x,
+         eruptions=permy)%>%
+  select(waiting,eruptions,type)
+
+# add dataset to visualize this permutation in between by adding together original (x,y) and new (x,y) columns
+exampleNullPlotBuild2 <- examplePlotBuild1 %>%
+  mutate(type="Permutation")
+# nulldat <- data.frame(waiting=NA,eruptions=NA,type="No More")
+
+exampleNullPlotBuild <- rbind(examplePlotBuild1,exampleNullPlotBuild2,exampleNullPlotBuild3) %>%
+  mutate(type = factor(type,levels=c("Original","Permutation","Null Plot")),
+         plottype = "Null Plot Construction",
+         permx=NA,permy=NA)
+exampleNullPlotBuild$permx[exampleNullPlotBuild$type == "Permutation"] <- exampleNullPlotBuild3$waiting
+exampleNullPlotBuild$permy[exampleNullPlotBuild$type == "Permutation"] <- exampleNullPlotBuild3$eruptions
+
+```
+
+---
+#### Generating Null Plots for Tea-Tasting Lineups
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=10,fig.height=7, cache=TRUE}
+p2 <- ggplot() +
+  geom_point(aes(x=waiting,y=eruptions), data=exampleNullPlotBuild) +
+  geom_segment(aes(x=waiting,y=eruptions, xend=permx, yend=permy),data=exampleNullPlotBuild,
+               arrow = arrow(length = unit(0.2,"cm")), alpha=.2) +
+  scale_y_continuous(position = "right")+
+  facet_grid(plottype~type, scales="free_x", switch="y") +
+  theme_bw()+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        strip.text = element_text(size=12))
+
+ggsave(file="MakingNullPlots.png",dpi=600,
+       width=10, height=5,units="in")
+
+knitr::include_graphics("MakingNullPlots.png")
+
+```
+
+---
+#### Generating Target Plots for Tea-Tasting Lineups
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=10,fig.height=7, cache=TRUE}
+p1 <- ggplot() +
+  geom_point(aes(x=waiting,y=eruptions), data=exampleTargetPlotBuild) +
+  geom_segment(aes(x=waiting,y=eruptions, xend=permx, yend=permy),data=exampleTargetPlotBuild,
+               arrow = arrow(length = unit(0.2,"cm")), alpha=.2) +
+  facet_grid(plottype~type, scales="free_x", switch="y") +
+  scale_y_continuous(position = "right")+
+  stat_smooth(aes(x=waiting,y=eruptions), data=examplePlotBuild2alt, se=F) +
+  theme_bw() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        strip.text = element_text(size=12))
+
+ggsave(file="MakingTargetPlots.png",dpi=600,
+       width=10, height=5,units="in")
+
+knitr::include_graphics("MakingTargetPlots.png")
+```
+
+---
+### Example Tea Tasting Lineup Plot
+
+
+```{r,echo=FALSE,fig.width=9, fig.height=6, out.height=500,out.width=750, fig.align='center' }
+p4 <- tt_lineup_plot(make_lineup_dat(M=8, dat=faithful, xname="waiting", yname="eruptions", seed=12345))+
+  theme(panel.spacing = unit(.2, "lines"),
+        strip.text=element_text(size=14))
+
+ggsave(file="faithful_lineup.png",dpi=600,
+       width=9, height=6,units="in")
+
+knitr::include_graphics("faithful_lineup.png")
+```
+
+---
 # Tables
 
 If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
