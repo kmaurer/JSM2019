@@ -19,6 +19,21 @@ class: center, middle, inverse, title-slide
 ---
 
 
+
+&lt;style&gt;
+  .col2 {
+    columns: 2 200px;         /* number of columns and width in pixels*/
+    -webkit-columns: 2 200px; /* chrome, safari */
+    -moz-columns: 2 200px;    /* firefox */
+  }
+  .col3 {
+    columns: 3 100px;
+    -webkit-columns: 3 100px;
+    -moz-columns: 3 100px;
+  }
+&lt;/style&gt;
+
+
 ### Lady Tasting Tea &lt;sup&gt;1&lt;/sup&gt;
 
 
@@ -45,7 +60,6 @@ class: center, middle, inverse, title-slide
 Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sharingan_triple.svg)
 
 ---
-
 ### Lineups 
 
 &lt;div class="figure" style="text-align: center"&gt;
@@ -57,15 +71,12 @@ Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sharin
 
 Image credit: [Wikimedia Commons](https://upload.wikimedia.org/wikipedia/commons/0/04/Oppstilling-2.jpg)
 
-
 ---
-
 ### Lineups (for Visual Inference) &lt;sup&gt;2&lt;/sup&gt;
 
 .footnote[
 [2] Buja, A., Cook, D., Hofmann, H., Lawrence, M., Lee, E. K., Swayne, D. F., &amp; Wickham, H. (2009)
 ]
-
 
 &lt;div class="figure" style="text-align: center"&gt;
 &lt;img src="JSM2019Slides_files/figure-html/unnamed-chunk-3-1.png" alt="Can the statistician pick the real data out of a randomized lineup of data simulated under the null?" width="570" height="380" /&gt;
@@ -74,7 +85,6 @@ Image credit: [Wikimedia Commons](https://upload.wikimedia.org/wikipedia/commons
 ---
 
 ### Lineups (for Visual Inference)
-
 
 - Plot of real data hidden in set of K-1 plots of data generated under null model
 &lt;br&gt;&lt;br&gt;
@@ -135,15 +145,15 @@ class: center, middle
 
 &lt;img src="MakingTargetPlots.png" width="8000" style="display: block; margin: auto;" /&gt;
 
-
 ---
 ### Example Tea Tasting Lineup
 
 &lt;img src="faithful_lineup.png" width="750" height="500" style="display: block; margin: auto;" /&gt;
+
 ---
 ### Properties
 
-- Looks similar to traditional lineup for visual inference
+- Looks similar to traditional lineup for visual inference but task different
 
 - p-values for single TT lineup evaluation are no longer binary
 
@@ -153,15 +163,12 @@ class: center, middle
 
 ### Open Questions
 
-1. Does the TT lineup have discriminative power in practice?
+#### 1. Does the TT lineup have discriminative power in practice?
 
 --
 
-2. Are the TT lineup p-values hypergeometrically distributed?
 
---
-
-3. How might the TT lineup compare to numerical tests?
+#### 2. Are correct guess counts hypergeometrically distributed for a true null?
 
 ---
 ### Survey
@@ -179,6 +186,7 @@ class: center, middle
   + blinded drop-box for return
   
 --
+&lt;br&gt;&lt;br&gt; 
 
 - Randomization: 
 
@@ -188,9 +196,11 @@ class: center, middle
   + Permutation step for each plot construction
 
 --
+&lt;br&gt;&lt;br&gt; 
 
-- 45 participants completed all eight lineups 
+- 45 participants 
   + 24 Undergrad, 14 Grad, 6 Faculty, 1 Unknown
+  + 41 completed all eight lineups 
 
 ---
 class: center, middle
@@ -200,18 +210,59 @@ class: center, middle
 ---
 ### 1. Does the TT lineup have discriminative power in practice?
 
+&lt;img src="survey_data_strength_evidence.png" width="900" style="display: block; margin: auto auto auto 0;" /&gt;
+
+---
+### 1. Does the TT lineup have discriminative power in practice? Yes!
+
+&lt;div class="figure" style="text-align: left"&gt;
+&lt;img src="survey_data_strength_evidence2.png" alt="* t-test strongly suggests more correct answers than lower strength relationship" width="900" /&gt;
+&lt;p class="caption"&gt;* t-test strongly suggests more correct answers than lower strength relationship&lt;/p&gt;
+&lt;/div&gt;
 
 ---
 ### 2. Are the TT lineup p-values hypergeometrically distributed?
 
 &lt;img src="DensityComparisons.png" width="6400" style="display: block; margin: auto;" /&gt;
 
+???
+
+Chi Square tests for matched distribution reject the hypergeometric distribution with pvalues &lt; 0.001
+---
+
+### 2. Are the TT lineup p-values hypergeometrically distributed? No. 
+
+
+This would be true, **assuming** that Null and Target plots are indestiguishable under the null
+
+--
+
+So why arn't they?
 
 ---
-### 3. How might the TT lineup compare to numerical tests?
 
+### 2. Are the TT lineup p-values hypergeometrically distributed? No. Why not?
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="MakingUnifTargetPlots.png" alt="Sometimes data from the null are &amp;quot;steriotypical&amp;quot;" width="8000" /&gt;
+&lt;p class="caption"&gt;Sometimes data from the null are "steriotypical"&lt;/p&gt;
+&lt;/div&gt;
 
 ---
+### 2. Are the TT lineup p-values hypergeometrically distributed? No. Why not?
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="MakingUnifTargetPlots3.png" alt="Sometimes data from the null are &amp;quot;weird&amp;quot; (type I errors)" width="8000" /&gt;
+&lt;p class="caption"&gt;Sometimes data from the null are "weird" (type I errors)&lt;/p&gt;
+&lt;/div&gt;
+
+---
+### 2. Are the TT lineup p-values hypergeometrically distributed? No. Why not?
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="MakingUnifTargetPlots2.png" alt="Sometimes data from the null are &amp;quot;steriotypical&amp;quot;, but our method are unstable" width="8000" /&gt;
+&lt;p class="caption"&gt;Sometimes data from the null are "steriotypical", but our method are unstable&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
 class: center, middle
 
 # Thanks!

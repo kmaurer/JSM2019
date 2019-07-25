@@ -14,6 +14,21 @@ output:
       countIncrementalSlides: false
 ---
 
+
+<style>
+  .col2 {
+    columns: 2 200px;         /* number of columns and width in pixels*/
+    -webkit-columns: 2 200px; /* chrome, safari */
+    -moz-columns: 2 200px;    /* firefox */
+  }
+  .col3 {
+    columns: 3 100px;
+    -webkit-columns: 3 100px;
+    -moz-columns: 3 100px;
+  }
+</style>
+
+
 ### Lady Tasting Tea <sup>1</sup>
 
 ```{r setup, include=FALSE}
@@ -46,7 +61,6 @@ knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/thumb/3/
 Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sharingan_triple.svg)
 
 ---
-
 ### Lineups 
 
 ```{r, echo=FALSE, fig.align='center', out.height=380, fig.cap='Can the witness pick the criminal out of a randomized lineup of people?'}
@@ -57,15 +71,12 @@ knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/0/04/Opp
 
 Image credit: [Wikimedia Commons](https://upload.wikimedia.org/wikipedia/commons/0/04/Oppstilling-2.jpg)
 
-
 ---
-
 ### Lineups (for Visual Inference) <sup>2</sup>
 
 .footnote[
 [2] Buja, A., Cook, D., Hofmann, H., Lawrence, M., Lee, E. K., Swayne, D. F., & Wickham, H. (2009)
 ]
-
 
 ```{r, echo=FALSE, fig.align='center', fig.width=9, fig.height=6, out.height=380,out.width=570,  cache=TRUE, fig.cap='Can the statistician pick the real data out of a randomized lineup of data simulated under the null?'}
 set.seed(12345)
@@ -92,7 +103,6 @@ tt_lineup_plot(dat_stacked) +
 ---
 
 ### Lineups (for Visual Inference)
-
 
 - Plot of real data hidden in set of K-1 plots of data generated under null model
 <br><br>
@@ -246,7 +256,6 @@ ggsave(file="MakingTargetPlots.png",dpi=600,
 knitr::include_graphics("MakingTargetPlots.png")
 ```
 
-
 ---
 ### Example Tea Tasting Lineup
 
@@ -260,10 +269,11 @@ ggsave(file="faithful_lineup.png",dpi=600,
 
 knitr::include_graphics("faithful_lineup.png")
 ```
+
 ---
 ### Properties
 
-- Looks similar to traditional lineup for visual inference
+- Looks similar to traditional lineup for visual inference but task different
 
 - p-values for single TT lineup evaluation are no longer binary
 
@@ -273,15 +283,12 @@ knitr::include_graphics("faithful_lineup.png")
 
 ### Open Questions
 
-1. Does the TT lineup have discriminative power in practice?
+#### 1. Does the TT lineup have discriminative power in practice?
 
 --
 
-2. Are the TT lineup p-values hypergeometrically distributed?
 
---
-
-3. How might the TT lineup compare to numerical tests?
+#### 2. Are correct guess counts hypergeometrically distributed for a true null?
 
 ---
 ### Survey
@@ -347,6 +354,7 @@ knitr::include_graphics("survey_data.png")
   + blinded drop-box for return
   
 --
+<br><br> 
 
 - Randomization: 
 
@@ -356,9 +364,11 @@ knitr::include_graphics("survey_data.png")
   + Permutation step for each plot construction
 
 --
+<br><br> 
 
-- 45 participants completed all eight lineups 
+- 45 participants 
   + 24 Undergrad, 14 Grad, 6 Faculty, 1 Unknown
+  + 41 completed all eight lineups 
 
 ---
 class: center, middle
@@ -368,6 +378,68 @@ class: center, middle
 ---
 ### 1. Does the TT lineup have discriminative power in practice?
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, out.width=900, out.height==450, fig.align='left', cache=TRUE}
+survey_dat_linear <- do.call(rbind,sim_data[c(7,2,1)]) %>%
+  mutate(simtype = factor(simtype, levels=c("Independent-Normal","Weak Linear","Strong Linear")))
+
+survey_dat <- do.call(rbind,sim_data[c(1,2,3,4,7,8)]) %>%
+  mutate(simtype = factor(simtype, levels=c("Independent-Normal","Weak Linear","Strong Linear",
+                                           "Independent-Uniform","Curved Weak","Curved Strong")))
+
+p6 <- ggplot() +
+  geom_point(aes(x,y,color=simtype), data=survey_dat) +
+  facet_wrap(~simtype, nrow=2, scales = "free") +
+  theme_bw()+
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        panel.grid = element_blank(),
+        panel.spacing = unit(1, "lines"),
+        legend.position = "none") +
+  scale_color_manual(values=c(rep("darkgoldenrod2",3),
+                              rep("cyan4",3)))
+
+ggsave(file="survey_data_strength_evidence.png",dpi=600,
+       width=9, height=4.5,units="in")
+
+knitr::include_graphics("survey_data_strength_evidence.png")
+```
+
+---
+### 1. Does the TT lineup have discriminative power in practice? Yes!
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, out.width=900, out.height==451, fig.cap="* t-test strongly suggests more correct answers than lower strength relationship", fig.align='left', cache=TRUE}
+
+label_dat <- survey_dat %>%
+  group_by(simtype) %>%
+  summarize(x=mean(range(x)),
+            y=mean(range(y))) %>%
+  as.data.frame() %>%
+  cbind(data.frame(label=paste0("Avg Correct = ",
+                                     c("4.72","6.05*","7.55*","5.05","6.19*","7.31*"),
+                                     "\nSd Correct = ",
+                                     c("1.45","1.49","0.95","1.79","1.87","1.49"))))
+
+p6.2 <- ggplot() +
+  geom_point(aes(x,y,color=simtype), alpha=.1, data=survey_dat) +
+  geom_text(aes(x=x,y=y,label=label,color=simtype),
+            size=6,data=label_dat)+
+  facet_wrap(~simtype, nrow=2, scales = "free") +
+  theme_bw()+
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        panel.grid = element_blank(),
+        panel.spacing = unit(1, "lines"),
+        legend.position = "none") +
+  scale_color_manual(values=c(rep("darkgoldenrod2",3),
+                              rep("cyan4",3)))
+
+ggsave(file="survey_data_strength_evidence2.png",dpi=600,
+       width=9, height=4.5,units="in")
+
+knitr::include_graphics("survey_data_strength_evidence2.png")
+```
 
 ---
 ### 2. Are the TT lineup p-values hypergeometrically distributed?
@@ -391,12 +463,12 @@ baseline_distn <- rbind(filter(tall_dat,distn_type=="Hypergeometric"),
 baseline_distn$facet_frame <- observed_distn$facet_frame
 
 # faceted version of empirical distributions
-p6 <- ggplot() + 
-  geom_bar(aes(x=x, y=density, fill=distn_type, color=distn_type),
-           size=1,alpha=.6, stat="identity",
+p7 <- ggplot() + 
+  geom_bar(aes(x=x-.02, y=density, fill=distn_type, color=distn_type),
+           size=.5,alpha=.7, stat="identity",
            data=baseline_distn)  + 
   geom_bar(aes(x=x+.02, y=density, fill=distn_type, color=distn_type),
-           size=1,alpha=.2, stat="identity", 
+           size=.5,alpha=.2, stat="identity", 
            data=observed_distn) +
   facet_grid(. ~ facet_frame ) +
   scale_fill_manual(values=c("gray80","red","blue")) +
@@ -413,12 +485,164 @@ ggsave(file="DensityComparisons.png",dpi=600,
 knitr::include_graphics("DensityComparisons.png")
 ```
 
+???
+
+Chi Square tests for matched distribution reject the hypergeometric distribution with pvalues < 0.001
+---
+
+### 2. Are the TT lineup p-values hypergeometrically distributed? No. 
+
+
+This would be true, **assuming** that Null and Target plots are indestiguishable under the null
+
+--
+
+So why arn't they?
 
 ---
-### 3. How might the TT lineup compare to numerical tests?
 
+### 2. Are the TT lineup p-values hypergeometrically distributed? No. Why not?
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=10,fig.height=7, cache=TRUE, fig.cap='Sometimes data from the null are "steriotypical"'}
+#------------------------------------
+### make plot building walkthrough with unif data
+set.seed(12345)
+exampleUnif1 <- data.frame(x=runif(50,-2,2),
+                           y=runif(50,-2,2),
+                           type="Original - Independent Uniform") 
+
+exampleUnif2 <- exampleUnif1 %>%
+  mutate(type="LOESS Fit then Residuals Permuted")  %>%
+  mutate(type = factor(type,levels=c("Original - Independent Uniform","LOESS Fit then Residuals Permuted","Target Plot")))
+
+exampleUnif3 <- exampleUnif1 %>%
+  make_alt_dat() %>%
+  mutate(type="Target Plot",
+         y=permy) %>%
+  select(x,y,type)
+
+exampleUnifAll<- rbind(exampleUnif1,exampleUnif2,exampleUnif3) %>%
+  mutate(type = factor(type,levels=c("Original - Independent Uniform","LOESS Fit then Residuals Permuted","Target Plot")),
+         plottype = "Target Plot Construction", 
+         permx=NA,permy=NA)
+exampleUnifAll$permx[exampleUnifAll$type == "LOESS Fit then Residuals Permuted"] <- exampleUnif3$x
+exampleUnifAll$permy[exampleUnifAll$type == "LOESS Fit then Residuals Permuted"] <- exampleUnif3$y
+
+p8 <- ggplot() +
+  geom_point(aes(x=x,y=y), data=exampleUnifAll) +
+  geom_segment(aes(x=x,y=y, xend=permx, yend=permy),data=exampleUnifAll,
+               arrow = arrow(length = unit(0.2,"cm")), alpha=.2) +
+  facet_grid(plottype~type, scales="free_x", switch="y") +
+  scale_y_continuous(position = "right")+
+  stat_smooth(aes(x=x,y=y), data=exampleUnif2, se=F) +
+  theme_bw() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        strip.text = element_text(size=12))
+
+ggsave(file="MakingUnifTargetPlots.png",dpi=600,
+       width=10, height=5,units="in")
+
+knitr::include_graphics("MakingUnifTargetPlots.png")
+```
 
 ---
+### 2. Are the TT lineup p-values hypergeometrically distributed? No. Why not?
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=10,fig.height=7, cache=TRUE, fig.cap='Sometimes data from the null are "weird" (type I errors)'}
+#------------------------------------
+### make plot building walkthrough with unif data
+set.seed(12)
+exampleUnif1 <- data.frame(x=runif(50,-2,2),
+                           y=runif(50,-2,2),
+                           type="Original - Independent Uniform") 
+
+exampleUnif2 <- exampleUnif1 %>%
+  mutate(type="LOESS Fit then Residuals Permuted")  %>%
+  mutate(type = factor(type,levels=c("Original - Independent Uniform","LOESS Fit then Residuals Permuted","Target Plot")))
+
+set.seed(5)
+exampleUnif3 <- exampleUnif1 %>%
+  make_alt_dat() %>%
+  mutate(type="Target Plot",
+         y=permy) %>%
+  select(x,y,type)
+
+exampleUnifAll<- rbind(exampleUnif1,exampleUnif2,exampleUnif3) %>%
+  mutate(type = factor(type,levels=c("Original - Independent Uniform","LOESS Fit then Residuals Permuted","Target Plot")),
+         plottype = "Target Plot Construction", 
+         permx=NA,permy=NA)
+exampleUnifAll$permx[exampleUnifAll$type == "LOESS Fit then Residuals Permuted"] <- exampleUnif3$x
+exampleUnifAll$permy[exampleUnifAll$type == "LOESS Fit then Residuals Permuted"] <- exampleUnif3$y
+
+p8.3 <- ggplot() +
+  geom_point(aes(x=x,y=y), data=exampleUnifAll) +
+  geom_segment(aes(x=x,y=y, xend=permx, yend=permy),data=exampleUnifAll,
+               arrow = arrow(length = unit(0.2,"cm")), alpha=.2) +
+  facet_grid(plottype~type, scales="free_x", switch="y") +
+  scale_y_continuous(position = "right")+
+  stat_smooth(aes(x=x,y=y), data=exampleUnif2, se=F) +
+  theme_bw() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        strip.text = element_text(size=12))
+
+ggsave(file="MakingUnifTargetPlots3.png",dpi=600,
+       width=10, height=5,units="in")
+
+knitr::include_graphics("MakingUnifTargetPlots3.png")
+
+```
+
+---
+### 2. Are the TT lineup p-values hypergeometrically distributed? No. Why not?
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.width=10,fig.height=7, cache=TRUE, fig.cap='Sometimes data from the null are "steriotypical", but our method are unstable'}
+#------------------------------------
+### make plot building walkthrough with unif data
+set.seed(1234)
+exampleUnif1 <- data.frame(x=runif(50,-2,2),
+                           y=runif(50,-2,2),
+                           type="Original - Independent Uniform") 
+
+exampleUnif2 <- exampleUnif1 %>%
+  mutate(type="LOESS Fit then Residuals Permuted")  %>%
+  mutate(type = factor(type,levels=c("Original - Independent Uniform","LOESS Fit then Residuals Permuted","Target Plot")))
+
+exampleUnif3 <- exampleUnif1 %>%
+  make_alt_dat() %>%
+  mutate(type="Target Plot",
+         y=permy) %>%
+  select(x,y,type)
+
+exampleUnifAll<- rbind(exampleUnif1,exampleUnif2,exampleUnif3) %>%
+  mutate(type = factor(type,levels=c("Original - Independent Uniform","LOESS Fit then Residuals Permuted","Target Plot")),
+         plottype = "Target Plot Construction", 
+         permx=NA,permy=NA)
+exampleUnifAll$permx[exampleUnifAll$type == "LOESS Fit then Residuals Permuted"] <- exampleUnif3$x
+exampleUnifAll$permy[exampleUnifAll$type == "LOESS Fit then Residuals Permuted"] <- exampleUnif3$y
+
+p8.2 <- ggplot() +
+  geom_point(aes(x=x,y=y), data=exampleUnifAll) +
+  geom_segment(aes(x=x,y=y, xend=permx, yend=permy),data=exampleUnifAll,
+               arrow = arrow(length = unit(0.2,"cm")), alpha=.2) +
+  facet_grid(plottype~type, scales="free_x", switch="y") +
+  scale_y_continuous(position = "right")+
+  stat_smooth(aes(x=x,y=y), data=exampleUnif2, se=F) +
+  theme_bw() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        strip.text = element_text(size=12))
+
+ggsave(file="MakingUnifTargetPlots2.png",dpi=600,
+       width=10, height=5,units="in")
+
+knitr::include_graphics("MakingUnifTargetPlots2.png")
+
+```
+
+---
+
 class: center, middle
 
 # Thanks!
