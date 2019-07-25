@@ -265,6 +265,41 @@ So why are target plots noticeably different?
 &lt;/div&gt;
 
 ---
+class: center, middle
+
+# Conclusions
+
+---
+### New Visual Inference Testing Method: 
+
+- Combines "Lady Tasting Tea" structure with lineup plot testing
+
+- Explored properties of tea-tasting lineups empirically with survey
+
+- P package implementation is available at [github.com/kmaurer/teaTasteR](https://github.com/kmaurer/teaTasteR)
+
+```r
+devtools::install_github("kmaurer/teaTasteR")
+```
+
+--
+
+### What did we learn? 
+
+1. Does the TT lineup have discriminative power in practice?
+&lt;br&gt;&lt;br&gt;
+*Yes*, more correct guesses for data with stronger relationship 
+&lt;br&gt;&lt;br&gt;
+
+2. Are correct guess counts hypergeometrically distributed for a true null? 
+&lt;br&gt;&lt;br&gt;
+*No*, issues with LOESS tail-instability.
+&lt;br&gt;&lt;br&gt;
+Should consider alternative methods for generating target plots
+(wider smoothing span/subsampling/bootstrapping)
+ 
+
+---
 
 class: center, middle
 
