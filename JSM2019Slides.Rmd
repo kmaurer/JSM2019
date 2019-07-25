@@ -492,12 +492,15 @@ Chi Square tests for matched distribution reject the hypergeometric distribution
 
 ### 2. Are the TT lineup p-values hypergeometrically distributed? No. 
 
+<br> <br> 
 
-This would be true, **assuming** that Null and Target plots are indestiguishable under the null
+This would be true, **assuming** that null plots and target plots are indistinguishable under the null
 
 --
 
-So why arn't they?
+<br> <br> 
+
+So why are target plots noticeably different?
 
 ---
 
