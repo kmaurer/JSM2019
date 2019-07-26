@@ -352,9 +352,17 @@ knitr::include_graphics("survey_data.png")
 
   + distributed to students and faculty of Miami University Stat Department
   + blinded drop-box for return
+
+--
+<br>
+
+- Content
+ 
+ + Tea-tasting lineups from 8 different datasets
+ + Each lineup had 8 null plots and 8 target plots
   
 --
-<br><br> 
+<br> 
 
 - Randomization: 
 
@@ -364,7 +372,7 @@ knitr::include_graphics("survey_data.png")
   + Permutation step for each plot construction
 
 --
-<br><br> 
+<br>
 
 - 45 participants 
   + 24 Undergrad, 14 Grad, 6 Faculty, 1 Unknown
@@ -650,18 +658,7 @@ class: center, middle
 # Conclusions
 
 ---
-### New Visual Inference Testing Method: 
 
-- Combines "Lady Tasting Tea" structure with lineup plot testing
-
-- Explored properties of tea-tasting lineups empirically with survey
-
-- P package implementation is available at [github.com/kmaurer/teaTasteR](https://github.com/kmaurer/teaTasteR)
-```{r, eval=FALSE}
-devtools::install_github("kmaurer/teaTasteR")
-```
-
---
 
 ### What did we learn? 
 
@@ -676,7 +673,19 @@ devtools::install_github("kmaurer/teaTasteR")
 <br><br>
 Should consider alternative methods for generating target plots
 (wider smoothing span/subsampling/bootstrapping)
- 
+  
+--
+  
+### New Visual Inference Testing Method: 
+
+- Combines "Lady Tasting Tea" structure with lineup plot testing
+
+- Explored properties of tea-tasting lineups empirically with survey
+
+- R package implementation is available at [github.com/kmaurer/teaTasteR](https://github.com/kmaurer/teaTasteR)
+```{r, eval=FALSE}
+devtools::install_github("kmaurer/teaTasteR")
+```
 
 ---
 
