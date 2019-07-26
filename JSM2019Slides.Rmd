@@ -493,7 +493,7 @@ knitr::include_graphics("DensityComparisons.png")
 
 ???
 
-Chi Square tests for matched distribution reject the hypergeometric distribution with pvalues < 0.001
+Chi Square tests for matched distribution reject the hypergeometric distribution with p-values < 0.001
 ---
 
 ### 2. Are the TT lineup p-values hypergeometrically distributed? No. 
