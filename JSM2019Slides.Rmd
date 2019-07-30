@@ -709,6 +709,8 @@ devtools::install_github("kmaurer/teaTasteR")
   Inc., Boston, MA URL http://www.rstudio.com/.
 - Wickham, 2019. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
 - Xie (2019). knitr: A General-Purpose Package for Dynamic Report Generation in R. R package version 1.22.
+- Xie (2019). xaringan: Presentation Ninja. R package version 0.11.1.
+  https://github.com/yihui/xaringan
 ---
 
 
@@ -716,5 +718,5 @@ class: center, middle
 
 # Thanks!
 
-Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+slides available at [github.com/kmaurer/JSM2019](https://github.com/kmaurer/JSM2019)
 
